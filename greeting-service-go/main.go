@@ -91,7 +91,7 @@ func getResponse(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("Failed to create request: %v", err)
 	}
-	req.Header.Set("Authorization", "basic "+token)
+	req.Header.Set("Authorization", token)
 
 
 	// Create an HTTP client with custom transport using the TLS config.
