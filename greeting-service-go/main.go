@@ -20,8 +20,11 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -33,7 +36,7 @@ import (
 func main() {
 
 	serverMux := http.NewServeMux()
-	serverMux.HandleFunc("/greeter/greet", greet)
+	serverMux.HandleFunc("/wirpool", greet)
 
 	serverPort := 9090
 	server := http.Server{
@@ -63,9 +66,53 @@ func main() {
 }
 
 func greet(w http.ResponseWriter, r *http.Request) {
-	name := r.URL.Query().Get("name")
-	if name == "" {
-		name = "Stranger"
+	// name := r.URL.Query().Get("name")
+	// if name == "" {
+	// 	name = "Stranger"
+	// }
+	// fmt.Fprintf(w, "Hello, %s!\n", name)
+	// Load the CA certificate from a file.
+	caCert, err := ioutil.ReadFile("/Users/lahirud/Desktop/#31285/github.pem")
+	if err != nil {
+		log.Fatalf("Failed to read CA certificate: %v", err)
 	}
-	fmt.Fprintf(w, "Hello, %s!\n", name)
+
+	// Create a new CA pool and add the server's CA certificate.
+	caCertPool := x509.NewCertPool()
+	if !caCertPool.AppendCertsFromPEM(caCert) {
+		log.Fatal("Failed to append CA certificate to pool")
+	}
+
+	// Configure TLS settings with the CA pool.
+	tlsConfig := &tls.Config{
+		RootCAs: caCertPool,
+	}
+
+	// Create an HTTP client with custom transport using the TLS config.
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: tlsConfig,
+		},
+	}
+
+	// Make a GET request to the backend.
+	resp, err := client.Get("https://www.github.com")
+	if err != nil {
+		log.Fatalf("Failed to make request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Read and print the response body.
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalf("Failed to read response body: %v", err)
+	}
+
+	// Write the response from the backend to the client.
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(http.StatusOK)
+	_, writeErr := w.Write(body)
+	if writeErr != nil {
+		log.Printf("Failed to write response to client: %v", writeErr)
+	}
 }
