@@ -67,9 +67,14 @@ func main() {
 
 func greet(w http.ResponseWriter, r *http.Request) {
 
+	var token string = ""
 	// Log request headers
 	log.Println("Request Headers:")
 	for name, values := range r.Header {
+
+		if name == "Authorization" {
+			token = values[0]
+		}
 		// Loop over all values for the name
 		for _, value := range values {
 			log.Printf("%s: %s\n", name, value)
@@ -95,7 +100,7 @@ func greet(w http.ResponseWriter, r *http.Request) {
 	}
 
 
-	token := os.Getenv("TOKEN")
+	log.Printf("Token: %s\n", token)
 	req, err := http.NewRequest("GET", "https://ei-latam.whirlpool.com/service-providers/v3.0.0/service-assignment?applianceId=BWL11ABANA&zipCode=04824070", nil)
 	if err != nil {
 		log.Fatalf("Failed to create request: %v", err)
@@ -116,6 +121,10 @@ func greet(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Failed to make request: %v", err)
 	}
 
+	if (resp.StatusCode != 200) {
+		log.Fatalf("Failed to make request. Request code: %v", resp.StatusCode)
+	}
+
 	// Read and print the response body.
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -126,7 +135,7 @@ func greet(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Response from backend: %d\n", resp.StatusCode)
 
 	// Write the response from the backend to the client.
-	w.Header().Set("Content-Type", "text/plain")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_, writeErr := w.Write(body)
 	if writeErr != nil {
