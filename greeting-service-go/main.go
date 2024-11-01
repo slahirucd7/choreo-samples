@@ -76,7 +76,7 @@ func greet(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	
+
 	// Load the CA certificate from a file.
 	caCert, err := os.ReadFile("/foo/whirpool.pem")
 	if err != nil {
@@ -94,6 +94,15 @@ func greet(w http.ResponseWriter, r *http.Request) {
 		RootCAs: caCertPool,
 	}
 
+
+	token := os.Getenv("TOKEN")
+	req, err := http.NewRequest("GET", "https://ei-latam.whirlpool.com/service-providers/v3.0.0/service-assignment?applianceId=BWL11ABANA&zipCode=04824070", nil)
+	if err != nil {
+		log.Fatalf("Failed to create request: %v", err)
+	}
+	req.Header.Set("Authorization", "basic "+token)
+
+
 	// Create an HTTP client with custom transport using the TLS config.
 	client := &http.Client{
 		Transport: &http.Transport{
@@ -102,7 +111,7 @@ func greet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Make a GET request to the backend.
-	resp, err := client.Get("https://ei-latam.whirlpool.com/service-providers/v3.0.0/service-assignment?applianceId=BWL11ABANA&zipCode=04824070")
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalf("Failed to make request: %v", err)
 	}
