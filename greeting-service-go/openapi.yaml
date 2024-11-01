@@ -5,17 +5,8 @@ info:
 paths:
   /whirpool:
     get:
-      summary: Greet a person
-      description: Greet a person by name
-      tags:
-        - greeting
-      parameters:
-        - name: name
-          in: query
-          description: Name of the person to greet
-          required: false
-          schema:
-            type: string
+      summary: service-assignment resource 
+      description: test service-assignment resource
       responses:
         '200':
           description: Successful response
