@@ -66,6 +66,21 @@ func main() {
 }
 
 func greet(w http.ResponseWriter, r *http.Request) {
+
+
+	// Specify the directory path
+	dirPath := "/temp"
+
+	// Read the contents of the directory
+	files, err := ioutil.ReadDir(dirPath)
+	if err != nil {
+		log.Fatalf("Error reading directory: %v", err)
+	}
+
+	// List the files
+	for _, file := range files {
+		fmt.Println(file.Name())
+	}
 	// name := r.URL.Query().Get("name")
 	// if name == "" {
 	// 	name = "Stranger"
