@@ -41,6 +41,8 @@ COPY --from=builder /app/go-greeter .
 
 RUN mkdir -p /temp
 
+RUN chmod -R 777 /temp
+
 # Create a user with a known UID/GID within range 10000-20000.
 # This is required by Choreo to run the container as a non-root user.
 RUN adduser \
