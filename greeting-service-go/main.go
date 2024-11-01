@@ -110,9 +110,16 @@ func getResponse(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("Failed to make request: %v", err)
 	}
+	defer resp.Body.Close()
 
-	if (resp.StatusCode != 200) {
-		log.Fatalf("Failed to make request. Request code: %v", resp.StatusCode)
+	if resp.StatusCode != http.StatusOK {
+		log.Printf("Received non-200 response code: %v", resp.StatusCode)
+		// Optionally read the body and send it back to the client
+		body, _ := io.ReadAll(resp.Body)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(resp.StatusCode)
+		w.Write(body)
+		return
 	}
 
 	// Read and print the response body.
@@ -131,5 +138,4 @@ func getResponse(w http.ResponseWriter, r *http.Request) {
 	if writeErr != nil {
 		log.Printf("Failed to write response to client: %v", writeErr)
 	}
-	defer resp.Body.Close()
 }
