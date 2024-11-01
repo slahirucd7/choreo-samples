@@ -115,13 +115,15 @@ func greet(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatalf("Failed to make request: %v", err)
 	}
-	defer resp.Body.Close()
 
 	// Read and print the response body.
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatalf("Failed to read response body: %v", err)
 	}
+
+	log.Printf("Response from backend: %s\n", resp.Body)
+	log.Printf("Response from backend: %d\n", resp.StatusCode)
 
 	// Write the response from the backend to the client.
 	w.Header().Set("Content-Type", "text/plain")
@@ -130,4 +132,5 @@ func greet(w http.ResponseWriter, r *http.Request) {
 	if writeErr != nil {
 		log.Printf("Failed to write response to client: %v", writeErr)
 	}
+	defer resp.Body.Close()
 }
