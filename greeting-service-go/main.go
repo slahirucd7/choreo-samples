@@ -24,7 +24,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -66,28 +66,8 @@ func main() {
 }
 
 func greet(w http.ResponseWriter, r *http.Request) {
-
-
-	// Specify the directory path
-	dirPath := "/foo"
-
-	// Read the contents of the directory
-	files, err := ioutil.ReadDir(dirPath)
-	if err != nil {
-		log.Fatalf("Error reading directory: %v", err)
-	}
-
-	// List the files
-	for _, file := range files {
-		fmt.Println(file.Name())
-	}
-	// name := r.URL.Query().Get("name")
-	// if name == "" {
-	// 	name = "Stranger"
-	// }
-	// fmt.Fprintf(w, "Hello, %s!\n", name)
 	// Load the CA certificate from a file.
-	caCert, err := ioutil.ReadFile("/foo/whirpool.pem")
+	caCert, err := os.ReadFile("/foo/whirpool.pem")
 	if err != nil {
 		log.Fatalf("Failed to read CA certificate: %v", err)
 	}
@@ -117,7 +97,7 @@ func greet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Read and print the response body.
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatalf("Failed to read response body: %v", err)
 	}
@@ -134,3 +114,26 @@ func greet(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 }
+
+
+
+
+
+// // Specify the directory path
+// dirPath := "/foo"
+
+// // Read the contents of the directory
+// files, err := os.ReadDir(dirPath)
+// if err != nil {
+// 	log.Fatalf("Error reading directory: %v", err)
+// }
+
+// // List the files
+// for _, file := range files {
+// 	fmt.Println(file.Name())
+// }
+// // name := r.URL.Query().Get("name")
+// // if name == "" {
+// // 	name = "Stranger"
+// // }
+// // fmt.Fprintf(w, "Hello, %s!\n", name)
