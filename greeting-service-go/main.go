@@ -87,7 +87,7 @@ func greet(w http.ResponseWriter, r *http.Request) {
 	// }
 	// fmt.Fprintf(w, "Hello, %s!\n", name)
 	// Load the CA certificate from a file.
-	caCert, err := ioutil.ReadFile("/foo/github.pem")
+	caCert, err := ioutil.ReadFile("/foo/whirpool.pem")
 	if err != nil {
 		log.Fatalf("Failed to read CA certificate: %v", err)
 	}
@@ -111,7 +111,7 @@ func greet(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Make a GET request to the backend.
-	resp, err := client.Get("https://www.github.com")
+	resp, err := client.Get("https://ei-latam.whirlpool.com/service-providers/v3.0.0/service-assignment?applianceId=BWL11ABANA&zipCode=04824070")
 	if err != nil {
 		log.Fatalf("Failed to make request: %v", err)
 	}
