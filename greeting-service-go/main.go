@@ -69,7 +69,7 @@ func greet(w http.ResponseWriter, r *http.Request) {
 
 
 	// Specify the directory path
-	dirPath := "/temp"
+	dirPath := "/foo"
 
 	// Read the contents of the directory
 	files, err := ioutil.ReadDir(dirPath)
@@ -87,7 +87,7 @@ func greet(w http.ResponseWriter, r *http.Request) {
 	// }
 	// fmt.Fprintf(w, "Hello, %s!\n", name)
 	// Load the CA certificate from a file.
-	caCert, err := ioutil.ReadFile("/temp/github.pem")
+	caCert, err := ioutil.ReadFile("/foo/github.pem")
 	if err != nil {
 		log.Fatalf("Failed to read CA certificate: %v", err)
 	}
