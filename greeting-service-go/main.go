@@ -36,7 +36,7 @@ import (
 func main() {
 
 	serverMux := http.NewServeMux()
-	serverMux.HandleFunc("/whirpool", greet)
+	serverMux.HandleFunc("/whirpool", getResponse)
 
 	serverPort := 9090
 	server := http.Server{
@@ -65,22 +65,14 @@ func main() {
 	log.Println("Shutdown complete.")
 }
 
-func greet(w http.ResponseWriter, r *http.Request) {
+func getResponse(w http.ResponseWriter, r *http.Request) {
 
 	var token string = ""
-	// Log request headers
-	log.Println("Request Headers:")
 	for name, values := range r.Header {
-
 		if name == "Authorization" {
 			token = values[0]
 		}
-		// Loop over all values for the name
-		for _, value := range values {
-			log.Printf("%s: %s\n", name, value)
-		}
 	}
-
 
 	// Load the CA certificate from a file.
 	caCert, err := os.ReadFile("/foo/whirpool.pem")
@@ -94,13 +86,7 @@ func greet(w http.ResponseWriter, r *http.Request) {
 		log.Fatal("Failed to append CA certificate to pool")
 	}
 
-	// Configure TLS settings with the CA pool.
-	tlsConfig := &tls.Config{
-		RootCAs: caCertPool,
-	}
-
-
-	log.Printf("Token: %s\n", token)
+	log.Printf("Token from request: %s\n", token)
 	req, err := http.NewRequest("GET", "https://ei-latam.whirlpool.com/service-providers/v3.0.0/service-assignment?applianceId=BWL11ABANA&zipCode=04824070", nil)
 	if err != nil {
 		log.Fatalf("Failed to create request: %v", err)
@@ -111,8 +97,12 @@ func greet(w http.ResponseWriter, r *http.Request) {
 	// Create an HTTP client with custom transport using the TLS config.
 	client := &http.Client{
 		Transport: &http.Transport{
-			TLSClientConfig: tlsConfig,
+			TLSClientConfig: &tls.Config{
+				RootCAs: caCertPool,
+			},
+			IdleConnTimeout: 240 * time.Second,
 		},
+		Timeout: 240 * time.Second,
 	}
 
 	// Make a GET request to the backend.
@@ -143,26 +133,3 @@ func greet(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 }
-
-
-
-
-
-// // Specify the directory path
-// dirPath := "/foo"
-
-// // Read the contents of the directory
-// files, err := os.ReadDir(dirPath)
-// if err != nil {
-// 	log.Fatalf("Error reading directory: %v", err)
-// }
-
-// // List the files
-// for _, file := range files {
-// 	fmt.Println(file.Name())
-// }
-// // name := r.URL.Query().Get("name")
-// // if name == "" {
-// // 	name = "Stranger"
-// // }
-// // fmt.Fprintf(w, "Hello, %s!\n", name)
