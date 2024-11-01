@@ -3,7 +3,7 @@ info:
   title: Greeting Service
   version: 1.0.0
 paths:
-  /greeter/greet:
+  /whirpool:
     get:
       summary: Greet a person
       description: Greet a person by name

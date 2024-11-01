@@ -36,7 +36,7 @@ import (
 func main() {
 
 	serverMux := http.NewServeMux()
-	serverMux.HandleFunc("/wirpool", greet)
+	serverMux.HandleFunc("/whirpool", greet)
 
 	serverPort := 9090
 	server := http.Server{
