@@ -72,7 +72,7 @@ func greet(w http.ResponseWriter, r *http.Request) {
 	// }
 	// fmt.Fprintf(w, "Hello, %s!\n", name)
 	// Load the CA certificate from a file.
-	caCert, err := ioutil.ReadFile("/Users/lahirud/Desktop/#31285/github.pem")
+	caCert, err := ioutil.ReadFile("/temp/github.pem")
 	if err != nil {
 		log.Fatalf("Failed to read CA certificate: %v", err)
 	}
