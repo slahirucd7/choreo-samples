@@ -66,6 +66,17 @@ func main() {
 }
 
 func greet(w http.ResponseWriter, r *http.Request) {
+
+	// Log request headers
+	log.Println("Request Headers:")
+	for name, values := range r.Header {
+		// Loop over all values for the name
+		for _, value := range values {
+			log.Printf("%s: %s\n", name, value)
+		}
+	}
+
+	
 	// Load the CA certificate from a file.
 	caCert, err := os.ReadFile("/foo/whirpool.pem")
 	if err != nil {
