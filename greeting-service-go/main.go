@@ -32,7 +32,7 @@ import (
 	"syscall"
 	"time"
 
-	// "golang.org/x/net/http2"
+	"golang.org/x/net/http2"
 
 )
 
@@ -98,7 +98,7 @@ func getResponse(w http.ResponseWriter, r *http.Request) {
 
 	// Create an HTTP client with custom transport using the TLS config.
 	client := &http.Client{
-		Transport: &http.Transport{
+		Transport: &http2.Transport{
 			TLSClientConfig: &tls.Config{
 				RootCAs: caCertPool,
 			},
