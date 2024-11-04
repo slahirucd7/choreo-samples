@@ -31,6 +31,9 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	// "golang.org/x/net/http2"
+
 )
 
 func main() {
@@ -44,7 +47,7 @@ func main() {
 		Handler: serverMux,
 	}
 	go func() {
-		log.Printf("Starting HTTP Greeter on port %d\n", serverPort)
+		log.Printf("Starting HTTP WPServer on port %d\n", serverPort)
 		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("HTTP ListenAndServe error: %v", err)
 		}
@@ -86,7 +89,6 @@ func getResponse(w http.ResponseWriter, r *http.Request) {
 		log.Fatal("Failed to append CA certificate to pool")
 	}
 
-	log.Printf("Token from request: %s\n", token)
 	req, err := http.NewRequest("GET", "https://ei-latam.whirlpool.com/service-providers/v3.0.0/service-assignment?applianceId=BWL11ABANA&zipCode=04824070", nil)
 	if err != nil {
 		log.Fatalf("Failed to create request: %v", err)
@@ -100,9 +102,9 @@ func getResponse(w http.ResponseWriter, r *http.Request) {
 			TLSClientConfig: &tls.Config{
 				RootCAs: caCertPool,
 			},
-			IdleConnTimeout: 240 * time.Second,
+			IdleConnTimeout: 300 * time.Second,
 		},
-		Timeout: 240 * time.Second,
+		Timeout: 300 * time.Second,
 	}
 
 	// Make a GET request to the backend.
@@ -128,8 +130,8 @@ func getResponse(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Failed to read response body: %v", err)
 	}
 
-	log.Printf("Response from backend: %s\n", resp.Body)
-	log.Printf("Response from backend: %d\n", resp.StatusCode)
+	// log.Printf("Response from backend: %s\n", resp.Body)
+	// log.Printf("Response from backend: %d\n", resp.StatusCode)
 
 	// Write the response from the backend to the client.
 	w.Header().Set("Content-Type", "application/json")
