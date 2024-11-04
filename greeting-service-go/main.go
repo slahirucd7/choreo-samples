@@ -81,17 +81,23 @@ func getResponse(w http.ResponseWriter, r *http.Request) {
 	caCert, err := os.ReadFile("/foo/whirpool.pem")
 	if err != nil {
 		log.Printf("Failed to read CA certificate: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+        return
 	}
 
 	// Create a new CA pool and add the server's CA certificate.
 	caCertPool := x509.NewCertPool()
 	if !caCertPool.AppendCertsFromPEM(caCert) {
 		log.Printf("Failed to append CA certificate to pool")
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+        return
 	}
 
 	req, err := http.NewRequest("GET", "https://ei-latam.whirlpool.com/service-providers/v3.0.0/service-assignment?applianceId=BWL11ABANA&zipCode=04824070", nil)
 	if err != nil {
 		log.Printf("Failed to create request: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+        return
 	}
 	req.Header.Set("Authorization", token)
 
@@ -111,6 +117,8 @@ func getResponse(w http.ResponseWriter, r *http.Request) {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("Failed to make request: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+        return
 	}
 	defer resp.Body.Close()
 
@@ -128,6 +136,8 @@ func getResponse(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Printf("Failed to read response body: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+        return
 	}
 
 	// log.Printf("Response from backend: %s\n", resp.Body)
