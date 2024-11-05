@@ -107,6 +107,7 @@ func getResponse(w http.ResponseWriter, r *http.Request) {
 				RootCAs: caCertPool,
 			},
 			// IdleConnTimeout: 120 * time.Second,
+			DisableKeepAlives: true,
 		},
 		// Timeout: 120 * time.Second,
 	}
