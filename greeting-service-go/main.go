@@ -108,9 +108,9 @@ func getResponse(w http.ResponseWriter, r *http.Request) {
 			TLSClientConfig: &tls.Config{
 				RootCAs: caCertPool,
 			},
-			IdleConnTimeout: 300 * time.Second,
+			IdleConnTimeout: 120 * time.Second,
 		},
-		Timeout: 300 * time.Second,
+		Timeout: 120 * time.Second,
 	}
 
 	// Make a GET request to the backend.
