@@ -13,16 +13,16 @@ endpoints:
       - Public
     schemaFilePath: openapi.yaml
 
-  # # Step 2 - add this endpoint and redeploy.
-  # # FAILURE: sanitizeQuery strips hyphens → tokens [create, students, public]
-  # # All 3 tokens match "create-students-quick-public" in APIM Atlas search.
-  # # Exact context path filter leaves 0 results → "cannot find exactly 1 API"
-  # - name: create-students-public
-  #   displayName: Create Students Public
-  #   service:
-  #     basePath: /
-  #     port: 8080
-  #   type: REST
-  #   networkVisibilities:
-  #     - Public
-  #   schemaFilePath: openapi.yaml
+  # Step 2 - add this endpoint and redeploy.
+  # FAILURE: sanitizeQuery strips hyphens → tokens [create, students, public]
+  # All 3 tokens match "create-students-quick-public" in APIM Atlas search.
+  # Exact context path filter leaves 0 results → "cannot find exactly 1 API"
+  - name: create-students-public
+    displayName: Create Students Public
+    service:
+      basePath: /
+      port: 8080
+    type: REST
+    networkVisibilities:
+      - Public
+    schemaFilePath: openapi.yaml
