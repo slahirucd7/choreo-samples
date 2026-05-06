@@ -20,6 +20,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -30,42 +31,58 @@ import (
 	"time"
 )
 
-func main() {
-
-	serverMux := http.NewServeMux()
-	serverMux.HandleFunc("/greeter/greet", greet)
-
-	serverPort := 9090
-	server := http.Server{
-		Addr:    fmt.Sprintf(":%d", serverPort),
-		Handler: serverMux,
-	}
-	go func() {
-		log.Printf("Starting HTTP Greeter on port %d\n", serverPort)
-		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
-			log.Fatalf("HTTP ListenAndServe error: %v", err)
-		}
-		log.Println("HTTP server stopped serving new requests.")
-	}()
-
-	stopCh := make(chan os.Signal, 1)
-	signal.Notify(stopCh, syscall.SIGINT, syscall.SIGTERM)
-	<-stopCh // Wait for shutdown signal
-
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	log.Println("Shutting down the server...")
-	if err := server.Shutdown(shutdownCtx); err != nil {
-		log.Fatalf("HTTP shutdown error: %v", err)
-	}
-	log.Println("Shutdown complete.")
+type Student struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
-func greet(w http.ResponseWriter, r *http.Request) {
-	name := r.URL.Query().Get("name")
-	if name == "" {
-		name = "Stranger"
+func main() {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/students/quick", createStudentQuick)
+	mux.HandleFunc("/students", createStudent)
+
+	server := http.Server{
+		Addr:    fmt.Sprintf(":%d", 8080),
+		Handler: mux,
 	}
-	fmt.Fprintf(w, "Hello, %s!\n", name)
+	go func() {
+		log.Println("Service starting on :8080")
+		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+			log.Fatalf("ListenAndServe error: %v", err)
+		}
+	}()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
+	<-stop
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Shutdown error: %v", err)
+	}
+}
+
+// createStudentQuick serves the create-students-quick-public endpoint.
+// This endpoint deploys successfully and is the one that causes APIM token collision.
+func createStudentQuick(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(Student{ID: "quick-001", Name: "Quick Student"})
+}
+
+// createStudent serves the create-students-public endpoint.
+// This endpoint fails to reconcile with APIM because the Atlas search for
+// "create-students-public" tokenizes to [create, students, public] and
+// false-matches "create-students-quick-public" which contains all 3 tokens.
+func createStudent(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(Student{ID: "001", Name: "New Student"})
 }
