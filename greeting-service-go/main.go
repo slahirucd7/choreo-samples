@@ -41,13 +41,13 @@ func main() {
 	mux.HandleFunc("/students/quick", createStudentQuick)
 	mux.HandleFunc("/students", createStudent)
 
-	server := http.Server{
+	serverVar := http.Server{
 		Addr:    fmt.Sprintf(":%d", 8080),
 		Handler: mux,
 	}
 	go func() {
 		log.Println("Service starting on :8080")
-		if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+		if err := serverVar.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 			log.Fatalf("ListenAndServe error: %v", err)
 		}
 	}()
@@ -58,7 +58,7 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	if err := server.Shutdown(ctx); err != nil {
+	if err := serverVar.Shutdown(ctx); err != nil {
 		log.Fatalf("Shutdown error: %v", err)
 	}
 }
