@@ -1,9 +1,11 @@
-schemaVersion: 1.0
+schemaVersion: "1.2"
 endpoints:
-  - name: hotel-reservation-api
-    service:
-      port: 9000
-    type: REST
-    networkVisibility: Public
-    context: /
-    schemaFilePath: openapi.yaml
+    - name: hotel-reservation-api
+      displayName: hotel-reservation-api
+      service:
+        basePath: /
+        port: 9000
+      type: REST
+      networkVisibilities:
+        - Public
+      schemaFilePath: openapi.yaml
