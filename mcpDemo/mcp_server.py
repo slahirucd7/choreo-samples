@@ -4,7 +4,7 @@ from mcp.server.fastmcp import FastMCP
 
 import hotel_service as svc
 
-mcp = FastMCP("Hotel Reservation Service")
+mcp = FastMCP("Hotel Reservation Service", host="0.0.0.0")
 
 
 @mcp.tool()
