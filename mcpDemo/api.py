@@ -11,12 +11,12 @@ router = APIRouter(prefix="/api", tags=["Hotel Reservation"])
 # ── Request / Response models ────────────────────────────────────────────────
 
 class ReservationRequest(BaseModel):
-    room_id: str = Field(example="R002")
-    guest_name: str = Field(example="John Doe")
-    guest_email: EmailStr = Field(example="john@example.com")
-    check_in: date = Field(example="2026-07-01")
-    check_out: date = Field(example="2026-07-05")
-    guests: int = Field(example=2)
+    room_id: str = Field(examples=["R002"])
+    guest_name: str = Field(examples=["John Doe"])
+    guest_email: EmailStr = Field(examples=["john@example.com"])
+    check_in: date = Field(examples=["2026-07-01"])
+    check_out: date = Field(examples=["2026-07-05"])
+    guests: int = Field(examples=[2])
 
     model_config = {
         "json_schema_extra": {
@@ -36,17 +36,17 @@ class ReservationRequest(BaseModel):
 
 @router.get("/rooms")
 def list_rooms(
-    room_type: Optional[str] = Query(default=None, example="double"),
+    room_type: Optional[str] = Query(default=None, examples=["double"]),
 ):
     return svc.list_rooms(room_type)
 
 
 @router.get("/rooms/search")
 def search_rooms(
-    check_in: date = Query(example="2026-07-01"),
-    check_out: date = Query(example="2026-07-05"),
-    guests: int = Query(example=2),
-    room_type: Optional[str] = Query(default=None, example="double"),
+    check_in: date = Query(examples=["2026-07-01"]),
+    check_out: date = Query(examples=["2026-07-05"]),
+    guests: int = Query(examples=[2]),
+    room_type: Optional[str] = Query(default=None, examples=["double"]),
 ):
     if check_out <= check_in:
         raise HTTPException(status_code=400, detail="check_out must be after check_in")
@@ -66,7 +66,7 @@ def create_reservation(body: ReservationRequest):
 
 @router.get("/reservations")
 def list_reservations(
-    guest_email: Optional[str] = Query(default=None, example="john@example.com"),
+    guest_email: Optional[str] = Query(default=None, examples=["john@example.com"]),
 ):
     return svc.list_reservations(guest_email)
 

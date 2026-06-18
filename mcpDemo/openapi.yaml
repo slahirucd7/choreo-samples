@@ -23,6 +23,32 @@ paths:
                   service:
                     type: string
 
+  /mcp:
+    get:
+      summary: MCP streamable-http transport (SSE stream)
+      operationId: mcp_get
+      responses:
+        "200":
+          description: MCP SSE stream
+    post:
+      summary: MCP streamable-http transport (send message)
+      operationId: mcp_post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: MCP response
+    delete:
+      summary: MCP streamable-http transport (close session)
+      operationId: mcp_delete
+      responses:
+        "200":
+          description: Session closed
+
   /api/rooms:
     get:
       summary: List all rooms
