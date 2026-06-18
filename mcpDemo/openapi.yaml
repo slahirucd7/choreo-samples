@@ -27,12 +27,18 @@ paths:
     get:
       summary: MCP streamable-http transport (SSE stream)
       operationId: mcp_get
+      security:
+        - OAuth2: []
+        - ApiKeyAuth: []
       responses:
         "200":
           description: MCP SSE stream
     post:
       summary: MCP streamable-http transport (send message)
       operationId: mcp_post
+      security:
+        - OAuth2: []
+        - ApiKeyAuth: []
       requestBody:
         required: true
         content:
@@ -45,6 +51,9 @@ paths:
     delete:
       summary: MCP streamable-http transport (close session)
       operationId: mcp_delete
+      security:
+        - OAuth2: []
+        - ApiKeyAuth: []
       responses:
         "200":
           description: Session closed
@@ -188,6 +197,17 @@ paths:
           description: Cannot cancel reservation
 
 components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth2/token
+          scopes: {}
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api-key
   schemas:
     Room:
       type: object
