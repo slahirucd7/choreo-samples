@@ -1,7 +1,8 @@
 schemaVersion: 1.0
 endpoints:
   - name: hotel-reservation-api
-    port: 9000
+    service:
+      port: 9000
     type: REST
     networkVisibility: Public
     context: /
