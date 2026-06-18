@@ -1,0 +1,241 @@
+openapi: 3.0.3
+info:
+  title: Hotel Reservation Service
+  description: REST API and MCP server for hotel reservations
+  version: 1.0.0
+servers:
+  - url: /
+paths:
+  /health:
+    get:
+      summary: Health check
+      operationId: health_check
+      responses:
+        "200":
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  service:
+                    type: string
+
+  /api/rooms:
+    get:
+      summary: List all rooms
+      operationId: list_rooms
+      parameters:
+        - name: room_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [single, double, suite]
+      responses:
+        "200":
+          description: List of rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Room"
+
+  /api/rooms/search:
+    get:
+      summary: Search available rooms
+      operationId: search_rooms
+      parameters:
+        - name: check_in
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: check_out
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: guests
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: room_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [single, double, suite]
+      responses:
+        "200":
+          description: Available rooms matching criteria
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RoomAvailability"
+        "400":
+          description: Invalid date range
+
+  /api/reservations:
+    get:
+      summary: List reservations
+      operationId: list_reservations
+      parameters:
+        - name: guest_email
+          in: query
+          required: false
+          schema:
+            type: string
+            format: email
+      responses:
+        "200":
+          description: List of reservations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Reservation"
+    post:
+      summary: Create a reservation
+      operationId: create_reservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReservationRequest"
+      responses:
+        "201":
+          description: Reservation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "400":
+          description: Invalid request or room unavailable
+
+  /api/reservations/{reservation_id}:
+    get:
+      summary: Get reservation details
+      operationId: get_reservation
+      parameters:
+        - name: reservation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Reservation details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "404":
+          description: Reservation not found
+    delete:
+      summary: Cancel a reservation
+      operationId: cancel_reservation
+      parameters:
+        - name: reservation_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Reservation cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "400":
+          description: Cannot cancel reservation
+
+components:
+  schemas:
+    Room:
+      type: object
+      properties:
+        room_id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        price_per_night:
+          type: number
+        max_guests:
+          type: integer
+        amenities:
+          type: array
+          items:
+            type: string
+
+    RoomAvailability:
+      allOf:
+        - $ref: "#/components/schemas/Room"
+        - type: object
+          properties:
+            total_price:
+              type: number
+            nights:
+              type: integer
+            available:
+              type: boolean
+
+    ReservationRequest:
+      type: object
+      required: [room_id, guest_name, guest_email, check_in, check_out, guests]
+      properties:
+        room_id:
+          type: string
+        guest_name:
+          type: string
+        guest_email:
+          type: string
+          format: email
+        check_in:
+          type: string
+          format: date
+        check_out:
+          type: string
+          format: date
+        guests:
+          type: integer
+
+    Reservation:
+      type: object
+      properties:
+        reservation_id:
+          type: string
+        room_id:
+          type: string
+        room_name:
+          type: string
+        guest_name:
+          type: string
+        guest_email:
+          type: string
+        check_in:
+          type: string
+          format: date
+        check_out:
+          type: string
+          format: date
+        guests:
+          type: integer
+        total_price:
+          type: number
+        status:
+          type: string
+          enum: [confirmed, cancelled]
