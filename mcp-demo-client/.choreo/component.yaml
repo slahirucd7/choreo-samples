@@ -4,7 +4,7 @@ endpoints:
       displayName: mcp-demo-client-api
       service:
         basePath: /
-        port: 8000
+        port: 8001
       type: REST
       networkVisibilities:
         - Public
