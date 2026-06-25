@@ -87,7 +87,7 @@ class MCPClient:
         ]
 
 
-async def run_agentic_loop(messages: list[dict], mcp: MCPClient, openai_tools: list) -> str:
+async def run_agentic_loop(messages: list[dict], mcp: MCPClient, openai_tools: list) -> tuple[str, list[str]]:
     """Run the LLM ↔ MCP tool call loop until the LLM returns a plain text response."""
     az_client = AsyncAzureOpenAI(
         azure_endpoint=AZURE_OPENAI_ENDPOINT,
@@ -96,6 +96,7 @@ async def run_agentic_loop(messages: list[dict], mcp: MCPClient, openai_tools: l
     )
 
     conversation = [m for m in messages if m.get("content") not in (None, "")]
+    tools_used: list[str] = []
     MAX_ROUNDS = 5
 
     for _ in range(MAX_ROUNDS):
@@ -109,11 +110,12 @@ async def run_agentic_loop(messages: list[dict], mcp: MCPClient, openai_tools: l
         msg = response.choices[0].message
 
         if not msg.tool_calls:
-            return msg.content or ""
+            return msg.content or "", tools_used
 
         conversation.append(msg.model_dump(exclude_unset=True))
 
         for tc in msg.tool_calls:
+            tools_used.append(tc.function.name)
             try:
                 args = json.loads(tc.function.arguments)
             except json.JSONDecodeError:
@@ -125,4 +127,4 @@ async def run_agentic_loop(messages: list[dict], mcp: MCPClient, openai_tools: l
                 "content": json.dumps(result),
             })
 
-    return "Unable to complete the request after multiple attempts."
+    return "Unable to complete the request after multiple attempts.", tools_used

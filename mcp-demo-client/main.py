@@ -66,8 +66,8 @@ async def mcp_chat(req: McpChatRequest, request: Request):
     logger.info("mcp-chat: %s", req.messages[-1].get("content", "")[:120])
 
     try:
-        content = await run_agentic_loop(req.messages, mcp_client, openai_tools)
-        return {"error": False, "content": content}
+        content, tools_used = await run_agentic_loop(req.messages, mcp_client, openai_tools)
+        return {"error": False, "content": content, "tools_used": tools_used}
     except Exception as e:
         logger.error("Agentic loop error: %s", e)
         raise HTTPException(status_code=502, detail=str(e))
