@@ -46,7 +46,7 @@ class MCPClient:
             raise RuntimeError("Not initialized. Call initialize() first.")
         headers = {**self.headers, "mcp-session-id": self.session_id}
         payload = {"jsonrpc": "2.0", "id": request_id, "method": method, "params": params}
-        response = httpx.post(self.url, headers=headers, json=payload, verify=False, timeout=10)
+        response = httpx.post(self.url, headers=headers, json=payload, verify=False, timeout=25)
         response.raise_for_status()
         return self._parse_event(response.text)
 
@@ -95,7 +95,7 @@ async def run_agentic_loop(messages: list[dict], mcp: MCPClient, openai_tools: l
         api_version=AZURE_OPENAI_API_VERSION,
     )
 
-    conversation = list(messages)
+    conversation = [m for m in messages if m.get("content") not in (None, "")]
     MAX_ROUNDS = 5
 
     for _ in range(MAX_ROUNDS):
