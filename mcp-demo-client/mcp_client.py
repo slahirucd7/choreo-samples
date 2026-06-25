@@ -36,7 +36,7 @@ class MCPClient:
                 "clientInfo": {"name": "mcp-demo-client", "version": "1.0"},
             },
         }
-        response = httpx.post(self.url, headers=self.headers, json=payload, verify=False, timeout=10)
+        response = httpx.post(self.url, headers=self.headers, json=payload, verify=False, timeout=30)
         response.raise_for_status()
         self.session_id = response.headers.get("mcp-session-id")
         return self._parse_event(response.text)

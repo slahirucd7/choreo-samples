@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -63,7 +63,7 @@ async def mcp_chat(req: McpChatRequest, request: Request):
     if not mcp_client:
         raise HTTPException(status_code=503, detail="MCP client not initialized")
 
-    logger.info("%s: mcp-chat: %s", email, req.messages[-1].get("content", "")[:120])
+    logger.info("mcp-chat: %s", req.messages[-1].get("content", "")[:120])
 
     try:
         content = await run_agentic_loop(req.messages, mcp_client, openai_tools)
