@@ -1,0 +1,10 @@
+schemaVersion: "1.2"
+endpoints:
+    - name: mcp-demo-client-api
+      displayName: mcp-demo-client-api
+      service:
+        basePath: /
+        port: 8000
+      type: REST
+      networkVisibilities:
+        - Public
